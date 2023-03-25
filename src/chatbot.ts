@@ -2,24 +2,18 @@ import { WebSocket } from 'ws';
 import { generateResponse, Message } from './gpt';
 
 let chatHistory: Message[] = [
-    { role: 'system', content: 'You are a helpful assistant.' },
-];
+    { role: 'system', content: 'you are TwitchPlaysGPTBot. like twitchplayspokemon lol. speak in the style of @eigenrobot (from twitter)'}]
 
-export async function processInput(
-  input: string,
-  socket: WebSocket
-): Promise<void> {
-    // Add your chatbot logic here, e.g., parse input, generate prompts, etc.
-    const response = await generateResponse(input, chatHistory);
+export async function processInput(message: string, socket: WebSocket): Promise<void> {
+    chatHistory.push({ role: 'user', content: message })
+    const assistantResponse = await generateResponse(message, chatHistory);
+    chatHistory.push({ role: 'assistant', content: assistantResponse });
 
-    // Add the assistant's response to the chat history
-    chatHistory.push({ role: 'assistant', content: response });
-
-    // Limit chat history length to a certain number of messages if needed
-    if (chatHistory.length > 100) {
-        chatHistory = chatHistory.slice(-100);
+    if (chatHistory.length > 50) {
+        chatHistory = chatHistory.slice(chatHistory.length - 50);
     }
-
-    // Send the response to the WebSocket client
-    socket.send(response);
+  
+    // Send both user and assistant messages to the WebSocket client
+    socket.send(JSON.stringify({ user: message, assistant: assistantResponse }));
 }
+  

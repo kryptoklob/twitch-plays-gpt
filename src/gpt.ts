@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API_KEY = "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";
-const GPT_API_URL = 'https://api.openai.com/v1/engines/gpt-3.5-turbo/completions';
+const GPT_API_URL = 'https://api.openai.com/v1/chat/completions';
 
 export interface Message {
     role: 'system' | 'user' | 'assistant';
@@ -13,13 +13,10 @@ export async function generateResponse(
     chatHistory: Message[]
 ): Promise<string> {
     try {
-        // Add the user's message to the chat history
-        chatHistory.push({ role: 'user', content: userMessage });
-
         const response = await axios.post(
         GPT_API_URL,
         {
-            model: 'gpt-3.5-turbo',
+            model: 'gpt-4',
             messages: chatHistory,
         },
         {
